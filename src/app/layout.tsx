@@ -1,3 +1,4 @@
+import Providers from "./providers";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -23,11 +24,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+        (function () {
+        try {
+          var stored = localStorage.getItem("theme"); // "light" | "dark" | null
+          var theme = (stored === "light" || stored === "dark") ? stored : "dark"; // default: dark
+          document.documentElement.classList.toggle("dark", theme === "dark");
+        } catch (e) {}
+        })();
+      `,
+          }}
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black dark:bg-black dark:text-white`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

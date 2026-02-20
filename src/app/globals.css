@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
+  /* Theme tokens (light is default; html.dark overrides) */
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+    color-scheme: light;
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    --page-bg: #ffffff;
+    --page-fg: rgb(24 24 27); /* zinc-900 */
+
+    --surface-bg: rgba(255, 255, 255, 0.72);
+    --surface-border: rgba(24, 24, 27, 0.14);
+
+    /* Decorative background (Aurora / glows)
+       In light mode we keep it VERY subtle so the page actually looks “light”. */
+    --aurora-opacity: 0.1;
+  }
+
+  html.dark {
+    color-scheme: dark;
+
+    --page-bg: #000000;
+    --page-fg: #ffffff;
+
+    --surface-bg: rgba(0, 0, 0, 0.62);
+    --surface-border: rgba(255, 255, 255, 0.14);
+
+    --aurora-opacity: 1;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  /* Always apply page bg/fg so toggling .dark repaints the whole app */
+  body {
+    background-color: var(--page-bg);
+    color: var(--page-fg);
+  }
+
+  /* Utility class you can use on “glass” cards/containers */
+  .surface {
+    background-color: var(--surface-bg);
+    border-color: var(--surface-border);
+  }
+
+  /* Calendar icon color (Chrome/Safari/Edge)
+     Keep brand-green in BOTH themes */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(62%) sepia(78%) saturate(420%) hue-rotate(95deg);
+    opacity: 0.95;
+    cursor: pointer;
+  }
+
+  html.dark input[type="date"]::-webkit-calendar-picker-indicator {
+    /* a bit brighter in dark mode */
+    opacity: 0.95; /* keep it the same in dark */
+  }
 }
