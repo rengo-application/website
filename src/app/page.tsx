@@ -115,6 +115,7 @@ export default function Page() {
 
               <Reveal delay={0.15}>
                 <form
+                  id="buscador"
                   action="/mapa"
                   method="GET"
                   onSubmit={handleSearchSubmit}
@@ -542,24 +543,21 @@ export default function Page() {
                     ¿Listo para rentar?
                   </h3>
                   <p className="mt-3 text-sm leading-6 text-zinc-700 dark:text-white/70">
-                    Explore autos disponibles y reserve en minutos. Si prefiere,
-                    también puede cotizar por WhatsApp.
+                    Explore autos disponibles y reserve en minutos.
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                  <a
-                    href="#explorar"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Scroll to the top so the user sees the full page (no manual scroll needed)
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     className="rounded-2xl bg-emerald-400 px-5 py-3 text-sm text-zinc-950 hover:bg-emerald-300"
                   >
                     Explorar autos
-                  </a>
-                  <a
-                    href="#reservar"
-                    className="rounded-2xl border border-white/15 bg-black/40 px-5 py-3 text-sm text-white hover:bg-black/55"
-                  >
-                    Cotizar por WhatsApp
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

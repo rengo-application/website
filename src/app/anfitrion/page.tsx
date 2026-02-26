@@ -122,6 +122,7 @@ export default function HostPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [captchaOk, setCaptchaOk] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -146,6 +147,7 @@ export default function HostPage() {
       vehicleYear: "",
     });
     setErrors({});
+    setCaptchaOk(false);
     setIsSubmitted(false);
     setIsSubmitting(false);
     setSubmitError(null);
@@ -160,6 +162,7 @@ export default function HostPage() {
   const openAffiliate = () => {
     setIsAffiliateOpen(true);
     setIsSubmitted(false);
+    setCaptchaOk(false);
   };
 
   const emailRegex = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/, []);
@@ -209,6 +212,10 @@ export default function HostPage() {
   const handleSubmitAffiliate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    if (!captchaOk) {
+      setSubmitError("Confirme que no es un robot antes de enviar.");
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitError(null);
@@ -434,213 +441,225 @@ export default function HostPage() {
         {/* MODAL: Afiliación (premium) */}
         {isAffiliateOpen && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center px-4 py-10"
+            className="fixed inset-0 z-50 overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-label="Formulario de afiliación"
           >
-            {/* Backdrop */}
-            <button
-              type="button"
-              onClick={closeAffiliate}
-              className="absolute inset-0 bg-black/70"
-              aria-label="Cerrar modal"
-            />
+            <div className="min-h-[100svh] px-4 py-8 sm:py-10 flex items-start sm:items-center justify-center">
+              {/* Backdrop (no button para no bloquear scroll en mobile) */}
+              <div
+                className="absolute inset-0 bg-black/70"
+                onClick={closeAffiliate}
+                aria-hidden="true"
+              />
 
-            {/* Card */}
-            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-black/60 backdrop-blur">
-              <div className="border-b border-white/10 p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-xs text-white/60">Anfitrión</div>
-                    <div className="mt-1 text-xl font-semibold text-white">
-                      Comenzar afiliación
-                    </div>
-                    <p className="mt-2 text-sm leading-6 text-white/70">
-                      Complete sus datos y los de su vehículo. Este formulario se envía a nuestra hoja por medio de Google Apps Script.
-                    </p>
-                  </div>
-
-                  {!isSubmitted && (
-                    <button
-                      type="button"
-                      onClick={closeAffiliate}
-                      className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white hover:bg-white/10"
-                    >
-                      Cerrar
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="p-6">
-                {isSubmitted ? (
-                  <div className="rounded-3xl border border-emerald-400/25 bg-emerald-500/10 p-6">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/15 ring-1 ring-emerald-400/25">
-                        <CheckCircle2 className="h-5 w-5 text-emerald-200" />
-                      </span>
-                      <div>
-                        <div className="text-base font-semibold text-white">
-                          ¡Solicitud lista!
-                        </div>
-                        <p className="mt-1 text-sm text-white/70">
-                          Recibimos su solicitud. En breve nos pondremos en contacto para continuar
-                          con el proceso.
-                        </p>
-                        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                          <button
-                            type="button"
-                            onClick={closeAffiliate}
-                            className="rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 hover:bg-emerald-300"
-                          >
-                            Listo
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmitAffiliate} className="grid gap-5">
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div>
-                        <label className="text-sm text-white/80">Nombre</label>
-                        <input
-                          value={form.name}
-                          onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                          placeholder="Ej. Juan Perez"
-                          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                        />
-                        {errors.name && (
-                          <div className="mt-2 text-xs text-rose-300">{errors.name}</div>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="text-sm text-white/80">Edad</label>
-                        <input
-                          value={form.age}
-                          onChange={(e) => setForm((p) => ({ ...p, age: e.target.value }))}
-                          inputMode="numeric"
-                          placeholder="Ej. 27"
-                          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                        />
-                        {errors.age && (
-                          <div className="mt-2 text-xs text-rose-300">{errors.age}</div>
-                        )}
-                      </div>
+              {/* Card */}
+              <div className="relative w-full max-w-2xl max-h-[90svh] overflow-hidden rounded-3xl border border-white/10 bg-black/60 backdrop-blur flex flex-col">
+                <div className="border-b border-white/10 p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-xs text-white/60">Anfitrión</div>
+                      <div className="mt-1 text-xl font-semibold text-white">Comenzar afiliación</div>
+                      <p className="mt-2 text-sm leading-6 text-white/70">
+                        Complete sus datos y los de su vehículo. Este formulario se envía a nuestra hoja por
+                        medio de Google Apps Script.
+                      </p>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div>
-                        <label className="text-sm text-white/80">Correo electrónico</label>
-                        <input
-                          value={form.email}
-                          onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                          placeholder="correo@ejemplo.com"
-                          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                        />
-                        {errors.email && (
-                          <div className="mt-2 text-xs text-rose-300">{errors.email}</div>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="text-sm text-white/80">Teléfono</label>
-                        <input
-                          value={form.phone}
-                          onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                          inputMode="tel"
-                          placeholder="Ej. +504 9999-9999"
-                          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                        />
-                        {errors.phone && (
-                          <div className="mt-2 text-xs text-rose-300">{errors.phone}</div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="rounded-3xl border border-white/10 bg-black/25 p-4">
-                      <div className="text-sm font-semibold text-white">Vehículo</div>
-                      <div className="mt-4 grid gap-4 md:grid-cols-3">
-                        <div>
-                          <label className="text-sm text-white/80">Marca</label>
-                          <input
-                            value={form.vehicleMake}
-                            onChange={(e) => setForm((p) => ({ ...p, vehicleMake: e.target.value }))}
-                            placeholder="Ej. Toyota"
-                            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                          />
-                          {errors.vehicleMake && (
-                            <div className="mt-2 text-xs text-rose-300">{errors.vehicleMake}</div>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="text-sm text-white/80">Modelo</label>
-                          <input
-                            value={form.vehicleModel}
-                            onChange={(e) => setForm((p) => ({ ...p, vehicleModel: e.target.value }))}
-                            placeholder="Ej. Corolla"
-                            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                          />
-                          {errors.vehicleModel && (
-                            <div className="mt-2 text-xs text-rose-300">{errors.vehicleModel}</div>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="text-sm text-white/80">Año</label>
-                          <input
-                            value={form.vehicleYear}
-                            onChange={(e) => setForm((p) => ({ ...p, vehicleYear: e.target.value }))}
-                            inputMode="numeric"
-                            placeholder="Ej. 2020"
-                            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                          />
-                          {errors.vehicleYear && (
-                            <div className="mt-2 text-xs text-rose-300">{errors.vehicleYear}</div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {submitError && (
-                      <div className="rounded-2xl border border-rose-400/25 bg-rose-500/10 p-3 text-sm text-rose-200">
-                        {submitError}
-                      </div>
-                    )}
-
-                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                    {/* Solo mostramos Cerrar mientras NO esté enviado */}
+                    {!isSubmitted && (
                       <button
                         type="button"
                         onClick={closeAffiliate}
-                        className="rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm text-white hover:bg-white/10"
-                        disabled={isSubmitting}
+                        className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white hover:bg-white/10"
                       >
-                        Cancelar
+                        X
                       </button>
-                      <button
-                        type="submit"
-                        className="rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-70"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? "Enviando…" : "Enviar solicitud"}
-                      </button>
-                    </div>
+                    )}
+                  </div>
+                </div>
 
-                    <div className="text-xs text-white/50">
-                      {/*
-                        URL del Sheet:
-                        https://docs.google.com/spreadsheets/d/1aDcUJC3SzW8m2_Vq6y_LLLVF-nVCZQGXIM92C_lMxlU/edit?usp=sharing
-
-                        Endpoint Web App (Apps Script):
-                        Use NEXT_PUBLIC_RENGO_AFFILIATE_ENDPOINT en .env.local
-                      */}
-                      Sus datos se usan únicamente para procesar su afiliación como anfitrión.
+                {/* Content scrollable */}
+                <div className="flex-1 overflow-y-auto p-6">
+                  {isSubmitted ? (
+                    <div className="rounded-3xl border border-emerald-400/25 bg-emerald-500/10 p-6">
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/15 ring-1 ring-emerald-400/25">
+                          <CheckCircle2 className="h-5 w-5 text-emerald-200" />
+                        </span>
+                        <div>
+                          <div className="text-base font-semibold text-white">¡Solicitud lista!</div>
+                          <p className="mt-1 text-sm text-white/70">
+                            Recibimos su solicitud. En breve nos pondremos en contacto para continuar con el
+                            proceso.
+                          </p>
+                          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                            <button
+                              type="button"
+                              onClick={closeAffiliate}
+                              className="rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 hover:bg-emerald-300"
+                            >
+                              Listo
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </form>
-                )}
+                  ) : (
+                    <form onSubmit={handleSubmitAffiliate} className="grid gap-5">
+                      <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+                        <label className="flex items-start gap-3 text-sm text-white/80">
+                          <input
+                            type="checkbox"
+                            checked={captchaOk}
+                            onChange={(e) => {
+                              setCaptchaOk(e.target.checked);
+                              if (e.target.checked) setSubmitError(null);
+                            }}
+                            className="mt-1 h-4 w-4 accent-emerald-400"
+                          />
+                          <span>
+                            Confirmo que no soy un robot.
+                            <span className="block text-xs text-white/50">
+                            </span>
+                          </span>
+                        </label>
+                      </div>
+
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <label className="text-sm text-white/80">Nombre</label>
+                          <input
+                            value={form.name}
+                            onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                            placeholder="Ej. Juan Perez"
+                            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                          />
+                          {errors.name && <div className="mt-2 text-xs text-rose-300">{errors.name}</div>}
+                        </div>
+
+                        <div>
+                          <label className="text-sm text-white/80">Edad</label>
+                          <input
+                            value={form.age}
+                            onChange={(e) => setForm((p) => ({ ...p, age: e.target.value }))}
+                            inputMode="numeric"
+                            placeholder="Ej. 27"
+                            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                          />
+                          {errors.age && <div className="mt-2 text-xs text-rose-300">{errors.age}</div>}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <label className="text-sm text-white/80">Correo electrónico</label>
+                          <input
+                            value={form.email}
+                            onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                            placeholder="correo@ejemplo.com"
+                            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                          />
+                          {errors.email && <div className="mt-2 text-xs text-rose-300">{errors.email}</div>}
+                        </div>
+
+                        <div>
+                          <label className="text-sm text-white/80">Teléfono</label>
+                          <input
+                            value={form.phone}
+                            onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                            inputMode="tel"
+                            placeholder="Ej. +504 9999-9999"
+                            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                          />
+                          {errors.phone && <div className="mt-2 text-xs text-rose-300">{errors.phone}</div>}
+                        </div>
+                      </div>
+
+                      <div className="rounded-3xl border border-white/10 bg-black/25 p-4">
+                        <div className="text-sm font-semibold text-white">Vehículo</div>
+                        <div className="mt-4 grid gap-4 md:grid-cols-3">
+                          <div>
+                            <label className="text-sm text-white/80">Marca</label>
+                            <input
+                              value={form.vehicleMake}
+                              onChange={(e) => setForm((p) => ({ ...p, vehicleMake: e.target.value }))}
+                              placeholder="Ej. Toyota"
+                              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                            />
+                            {errors.vehicleMake && (
+                              <div className="mt-2 text-xs text-rose-300">{errors.vehicleMake}</div>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="text-sm text-white/80">Modelo</label>
+                            <input
+                              value={form.vehicleModel}
+                              onChange={(e) => setForm((p) => ({ ...p, vehicleModel: e.target.value }))}
+                              placeholder="Ej. Corolla"
+                              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                            />
+                            {errors.vehicleModel && (
+                              <div className="mt-2 text-xs text-rose-300">{errors.vehicleModel}</div>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="text-sm text-white/80">Año</label>
+                            <input
+                              value={form.vehicleYear}
+                              onChange={(e) => setForm((p) => ({ ...p, vehicleYear: e.target.value }))}
+                              inputMode="numeric"
+                              placeholder="Ej. 2020"
+                              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                            />
+                            {errors.vehicleYear && (
+                              <div className="mt-2 text-xs text-rose-300">{errors.vehicleYear}</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {submitError && (
+                        <div className="rounded-2xl border border-rose-400/25 bg-rose-500/10 p-3 text-sm text-rose-200">
+                          {submitError}
+                        </div>
+                      )}
+
+                      {/* Botones SIEMPRE visibles en mobile */}
+                      <div className="sticky bottom-0 -mx-6 mt-2 border-t border-white/10 bg-black/80 px-6 py-4 backdrop-blur flex flex-col gap-3 sm:flex-row sm:justify-end">
+                        <button
+                          type="button"
+                          onClick={closeAffiliate}
+                          className="rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm text-white hover:bg-white/10"
+                          disabled={isSubmitting}
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-70"
+                          disabled={isSubmitting || !captchaOk}
+                        >
+                          {isSubmitting ? "Enviando…" : "Enviar solicitud"}
+                        </button>
+                      </div>
+
+                      <div className="text-xs text-white/50">
+                        {/*
+                          URL del Sheet:
+                          https://docs.google.com/spreadsheets/d/1aDcUJC3SzW8m2_Vq6y_LLLVF-nVCZQGXIM92C_lMxlU/edit?usp=sharing
+
+                          Endpoint Web App (Apps Script):
+                          Use NEXT_PUBLIC_RENGO_AFFILIATE_ENDPOINT en .env.local
+                        */}
+                        Sus datos se usan únicamente para procesar su afiliación como anfitrión.
+                      </div>
+                    </form>
+                  )}
+                </div>
               </div>
             </div>
           </div>
