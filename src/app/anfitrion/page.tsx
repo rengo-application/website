@@ -417,10 +417,9 @@ export default function HostPage() {
             <div className="grid gap-8 md:grid-cols-2 md:items-center">
               <div>
                 <div className="text-xs text-white/70">Anfitrión</div>
-                <h3 className="mt-2 text-2xl font-semibold">¿Listo para publicar su carro?</h3>
+                <h3 className="mt-2 text-2xl font-semibold">¿Listo para pre-registrar tu vehículo? </h3>
                 <p className="mt-3 text-sm leading-6 text-white/70">
-                  Regístrese en la app, suba fotos y documentos, y empiece a recibir solicitudes.
-                  Si prefiere, podemos orientarle por WhatsApp.
+                  Sé de los primeros en unirte a nuestros afiliados. Completa tu perfil ahora para asegurar tu lugar antes del lanzamiento oficial.
                 </p>
               </div>
 
@@ -430,7 +429,7 @@ export default function HostPage() {
                   onClick={openAffiliate}
                   className="inline-flex items-center justify-center rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-medium text-zinc-950 hover:bg-emerald-300"
                 >
-                  Comenzar afiliación
+                  Comenzar pre-registro
                 </button>
               </div>
             </div>
