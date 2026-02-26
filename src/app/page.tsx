@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import { AuroraBackground } from "@/components/AuroraBackground";
 import { Bento } from "@/components/Bento";
 import { Footer } from "@/components/Footer";
@@ -14,6 +17,53 @@ import {
 } from "lucide-react";
 
 export default function Page() {
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [dateError, setDateError] = useState<string | null>(null);
+
+  const toISODate = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const addDaysISO = (iso: string, days: number) => {
+    const d = new Date(`${iso}T00:00:00`);
+    d.setDate(d.getDate() + days);
+    return toISODate(d);
+  };
+
+  const todayISO = useMemo(() => toISODate(new Date()), []);
+  const tomorrowISO = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return toISODate(d);
+  }, []);
+
+  const endMinISO = useMemo(() => {
+    // End date must be at least 1 day after start
+    return startDate ? addDaysISO(startDate, 1) : tomorrowISO;
+  }, [startDate, tomorrowISO]);
+
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // Require both dates
+    if (!startDate || !endDate) {
+      e.preventDefault();
+      setDateError("Por favor seleccione la fecha de inicio y la fecha de fin para continuar.");
+      return;
+    }
+
+    // Must be strictly after (min 1 day)
+    if (endDate <= startDate) {
+      e.preventDefault();
+      setDateError("La fecha de fin debe ser al menos 1 día después de la fecha de inicio.");
+      return;
+    }
+
+    setDateError(null);
+  };
+
   return (
     <main className="relative min-h-screen bg-white text-zinc-900 dark:bg-black dark:text-white">
       <div className="pointer-events-none opacity-0 transition-opacity dark:opacity-100">
@@ -67,6 +117,7 @@ export default function Page() {
                 <form
                   action="/mapa"
                   method="GET"
+                  onSubmit={handleSearchSubmit}
                   className="mt-8 rounded-3xl border border-black/10 bg-white/80 dark:border-white/10 dark:bg-black/40 p-4 backdrop-blur md:p-5"
                 >
                   {" "}
@@ -83,9 +134,6 @@ export default function Page() {
                         <option>Tegucigalpa</option>
                         <option>San Pedro Sula</option>
                         <option>La Ceiba</option>
-                        <option>Roatán</option>
-                        <option>Comayagua</option>
-                        <option>Choluteca</option>
                       </select>
                     </div>
 
@@ -114,6 +162,18 @@ export default function Page() {
                       <input
                         name="start"
                         type="date"
+                        required
+                        min={todayISO}
+                        value={startDate}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setStartDate(v);
+                          setDateError(null);
+                          // If current end date is now invalid (same day or before), clear it
+                          if (endDate && v && endDate <= v) {
+                            setEndDate("");
+                          }
+                        }}
                         className="w-full rounded-2xl border border-black/10 bg-white text-zinc-900 dark:border-white/10 dark:bg-black/50 dark:text-white px-4 py-3 text-sm outline-none focus:border-emerald-400/50"
                       />
                     </div>
@@ -125,6 +185,13 @@ export default function Page() {
                       <input
                         name="end"
                         type="date"
+                        required
+                        min={endMinISO}
+                        value={endDate}
+                        onChange={(e) => {
+                          setEndDate(e.target.value);
+                          setDateError(null);
+                        }}
                         className="w-full rounded-2xl border border-black/10 bg-white text-zinc-900 dark:border-white/10 dark:bg-black/50 dark:text-white px-4 py-3 text-sm outline-none focus:border-emerald-400/50"
                       />
                     </div>
@@ -134,6 +201,11 @@ export default function Page() {
                       Por ahora: ciudades de Honduras. Luego agregamos mapa y
                       filtros avanzados.
                     </div>
+                    {dateError ? (
+                      <div className="text-xs text-red-600 dark:text-red-400">
+                        {dateError}
+                      </div>
+                    ) : null}
 
                     <button
                       type="submit"
@@ -560,7 +632,7 @@ export default function Page() {
           </Reveal>
         </section>
 
-        {/* FAQ placeholder */}
+        {/* FAQ */}
         <section id="faq" className="mx-auto max-w-6xl px-4 pb-10">
           <Reveal>
             <div className="rounded-3xl border border-black/10 bg-white/70 dark:border-white/10 dark:bg-black/35 p-8 backdrop-blur">
@@ -568,12 +640,72 @@ export default function Page() {
                 FAQ
               </div>
               <div className="mt-2 text-2xl font-semibold text-zinc-900 dark:text-white">
-                Preguntas frecuentes (placeholder)
+                Preguntas frecuentes
               </div>
               <p className="mt-3 text-sm text-zinc-700 dark:text-white/70">
-                Luego agregamos preguntas reales: requisitos, depósitos,
-                cancelaciones, entrega y seguros.
+                Respuestas rápidas a lo más consultado. Para ver todas las
+                preguntas, visite la página completa.
               </p>
+
+              <div className="mt-6 grid gap-3">
+                <details className="group rounded-2xl border border-black/10 bg-white/60 dark:border-white/10 dark:bg-black/30 p-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+                    <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                      ¿Qué es RENGO?
+                    </span>
+                    <span className="text-zinc-500 dark:text-white/60 transition-transform group-open:rotate-180">
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-sm leading-6 text-zinc-700 dark:text-white/70">
+                    RENGO es una plataforma digital que conecta a personas que
+                    necesitan movilidad con anfitriones que ofrecen carros en
+                    alquiler. Es similar a Airbnb, pero enfocado en vehículos en
+                    Honduras.
+                  </p>
+                </details>
+
+                <details className="group rounded-2xl border border-black/10 bg-white/60 dark:border-white/10 dark:bg-black/30 p-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+                    <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                      ¿Cómo funciona?
+                    </span>
+                    <span className="text-zinc-500 dark:text-white/60 transition-transform group-open:rotate-180">
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-sm leading-6 text-zinc-700 dark:text-white/70">
+                    En la app usted busca carros por ciudad, elige uno según sus
+                    necesidades, reserva y coordina la recogida. Si es anfitrión,
+                    publica su carro, recibe solicitudes, confirma reservas y
+                    recibe pagos de forma segura.
+                  </p>
+                </details>
+
+                <details className="group rounded-2xl border border-black/10 bg-white/60 dark:border-white/10 dark:bg-black/30 p-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+                    <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                      ¿Qué necesito para alquilar un carro?
+                    </span>
+                    <span className="text-zinc-500 dark:text-white/60 transition-transform group-open:rotate-180">
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-sm leading-6 text-zinc-700 dark:text-white/70">
+                    Ser mayor de edad, tener licencia de conducir válida y contar
+                    con un método de pago registrado en la app.
+                  </p>
+                </details>
+              </div>
+
+              <div className="mt-6">
+                <a
+                  href="/faq"
+                  className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 dark:text-emerald-200 dark:hover:text-emerald-100"
+                >
+                  Ver más preguntas <ArrowRight className="h-4 w-4" />
+                </a>
+              </div>
             </div>
           </Reveal>
         </section>

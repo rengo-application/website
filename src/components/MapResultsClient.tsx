@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { ArrowRight, Star, X, Search } from "lucide-react";
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
+import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
 
 type CarType = "SUV" | "Sedán" | "Pickup" | "4x4" | "Económico" | "Premium";
 const CAR_TYPES: CarType[] = [
@@ -50,7 +51,6 @@ type VehiclesQueryData = {
       } | null;
       favorite?: boolean | null;
       likes?: number | null;
-      trips?: number | null;
     }>;
   };
 };
@@ -96,14 +96,11 @@ const GET_MY_VEHICLES = gql`
         }
         favorite
         likes
-        trips
       }
     }
   }
 `;
 
-// Fallback data so the UI never breaks if the API returns 0 items or is unavailable.
-// Keep this typed as Listing[] to avoid `any` / unsafe member-access lint errors.
 const MOCK: Listing[] = [
   {
     id: "mock-1",
@@ -113,7 +110,7 @@ const MOCK: Listing[] = [
     pricePerDay: 95,
     rating: 4.86,
     trips: 32,
-    img: "/cars/familia.jpg",
+    img: "/cars/family.jpg",
     lat: 14.0723,
     lng: -87.1921,
   },
@@ -125,7 +122,7 @@ const MOCK: Listing[] = [
     pricePerDay: 55,
     rating: 4.74,
     trips: 21,
-    img: "/cars/economico.jpg",
+    img: "/cars/city.jpg",
     lat: 15.5042,
     lng: -88.025,
   },
@@ -366,8 +363,110 @@ function MapMock({
   );
 }
 
+function GoogleMapView({
+  listings,
+  selectedId,
+  onSelect,
+  apiKey,
+}: {
+  listings: Listing[];
+  selectedId?: string | null;
+  onSelect: (id: string) => void;
+  apiKey: string;
+}) {
+  const [zoom, setZoom] = useState(11);
+
+  const center = useMemo(() => {
+    if (!listings || listings.length === 0) {
+      return { lat: 14.0723, lng: -87.1921 }; // Tegucigalpa fallback
+    }
+    const avgLat =
+      listings.reduce((sum, l) => sum + Number(l.lat || 0), 0) / listings.length;
+    const avgLng =
+      listings.reduce((sum, l) => sum + Number(l.lng || 0), 0) / listings.length;
+    return {
+      lat: Number.isFinite(avgLat) ? avgLat : 14.0723,
+      lng: Number.isFinite(avgLng) ? avgLng : -87.1921,
+    };
+  }, [listings]);
+
+  if (!listings || listings.length === 0) {
+    return (
+      <div className="relative flex h-[520px] w-full items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-black/35 backdrop-blur">
+        <div className="text-center">
+          <div className="text-sm font-semibold text-white">Sin resultados</div>
+          <div className="mt-1 text-xs text-white/60">
+            Ajuste ciudad, tipo o fechas para ver opciones.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative h-[520px] w-full overflow-hidden rounded-3xl border border-white/10 bg-black/35 backdrop-blur">
+      <div className="absolute left-4 top-4 z-20 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-xs text-white/70 backdrop-blur">
+        Mapa (Google)
+      </div>
+
+      {/* Zoom controls (same UX as the mock map) */}
+      <div className="absolute right-4 top-4 z-20 grid gap-2">
+        <button
+          type="button"
+          onClick={() => setZoom((z) => Math.min(18, z + 1))}
+          className="h-10 w-10 rounded-2xl border border-white/10 bg-black/40 text-white/80 backdrop-blur hover:bg-black/55"
+          aria-label="Zoom in"
+        >
+          +
+        </button>
+        <button
+          type="button"
+          onClick={() => setZoom((z) => Math.max(4, z - 1))}
+          className="h-10 w-10 rounded-2xl border border-white/10 bg-black/40 text-white/80 backdrop-blur hover:bg-black/55"
+          aria-label="Zoom out"
+        >
+          –
+        </button>
+      </div>
+
+      <div className="absolute inset-0">
+        <APIProvider apiKey={apiKey}>
+          <Map
+            center={center}
+            zoom={zoom}
+            disableDefaultUI
+            gestureHandling="greedy"
+            style={{ width: "100%", height: "100%" }}
+          >
+            {listings.map((l) => {
+              const active = l.id === selectedId;
+              return (
+                <Marker
+                  key={l.id}
+                  position={{ lat: l.lat, lng: l.lng }}
+                  onClick={() => onSelect(l.id)}
+                  // A small visual cue for the selected marker
+                  opacity={active ? 1 : 0.85}
+                  zIndex={active ? 999 : 1}
+                />
+              );
+            })}
+          </Map>
+        </APIProvider>
+      </div>
+
+      {/* Subtle overlay to keep the same premium / dark aesthetic */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/25" />
+    </div>
+  );
+}
+
 export function MapResultsClient() {
   const sp = useSearchParams();
+
+  // NOTE: Add this in .env.local (dev will provide the real key later)
+  // NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_key_here
+  const googleMapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 
   const { start: defaultStart, end: defaultEnd } = defaultStartEnd();
 
@@ -420,12 +519,8 @@ export function MapResultsClient() {
         city || "Honduras"
       );
 
-      // Prefer explicit trips if the API has it; otherwise fallback to likes; otherwise 0.
-      const trips = Number(
-        (v as unknown as { trips?: number | null }).trips ??
-          (v as unknown as { likes?: number | null }).likes ??
-          0
-      );
+      // Backend may not expose `trips` on Vehicle; use `likes` as a safe proxy for now.
+      const trips = Number((v as unknown as { likes?: number | null }).likes ?? 0);
 
       // Rating: if API provides 0, keep 0; only default when null/undefined.
       const rating =
@@ -439,7 +534,7 @@ export function MapResultsClient() {
         pricePerDay: Number(v?.price ?? 0),
         rating,
         trips: Number.isFinite(trips) ? trips : 0,
-        img: (v?.images?.[0] as string) || "/cars/familia.jpg",
+        img: (v?.images?.[0] as string) || "/cars/family.jpg",
         lat: Number(pickup?.latitude ?? 14.0723),
         lng: Number(pickup?.longitude ?? -87.1921),
       };
@@ -468,6 +563,9 @@ export function MapResultsClient() {
 
   useEffect(() => {
     // Si cambian filtros (URL) y el seleccionado ya no existe, seleccionar el primero.
+    // Importante: si el usuario cerró el detalle (selectedId === null), NO auto-seleccionamos.
+    if (selectedId === null) return;
+
     if (filtered.length === 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedId(null);
@@ -500,9 +598,6 @@ export function MapResultsClient() {
               <option>Tegucigalpa</option>
               <option>San Pedro Sula</option>
               <option>La Ceiba</option>
-              <option>Roatán</option>
-              <option>Comayagua</option>
-              <option>Choluteca</option>
             </select>
           </div>
 
@@ -649,51 +744,67 @@ export function MapResultsClient() {
 
         {/* MAPA */}
         <div className="order-1 lg:order-2">
-          <MapMock
-            listings={filtered}
-            selectedId={selectedId}
-            onSelect={(id) => setSelectedId(id)}
-          />
+          <div className="relative">
+            {googleMapsKey ? (
+              <GoogleMapView
+                apiKey={googleMapsKey}
+                listings={filtered}
+                selectedId={selectedId}
+                onSelect={(id) => setSelectedId(id)}
+              />
+            ) : (
+              <MapMock
+                listings={filtered}
+                selectedId={selectedId}
+                onSelect={(id) => setSelectedId(id)}
+              />
+            )}
 
-          {/* Overlay tipo app (cuando seleccionas un pin) */}
-          {selected ? (
-            <div className="mt-4 rounded-3xl border border-white/10 bg-black/35 p-4 backdrop-blur">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold text-white">
-                    {selected.title}
+            {/* Overlay tipo Airbnb (flotante sobre el mapa) */}
+            {selected ? (
+              <div className="pointer-events-none absolute inset-x-3 bottom-3 z-30 sm:inset-x-4 sm:bottom-4">
+                <div className="pointer-events-auto mx-auto max-w-xl rounded-3xl border border-white/10 bg-black/55 p-4 shadow-2xl backdrop-blur">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-white">
+                        {selected.title}
+                      </div>
+                      <div className="mt-1 text-xs text-white/60">
+                        {selected.city} · {selected.type}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(null)}
+                      className="shrink-0 rounded-2xl border border-white/10 bg-white/5 p-2 text-white/70 hover:bg-white/10"
+                      aria-label="Cerrar"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                  <div className="mt-1 text-xs text-white/60">
-                    {selected.city} · {selected.type}
+
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <div className="text-sm text-white/80">
+                      <span className="font-semibold text-white">
+                        ${selected.pricePerDay}/día
+                      </span>{" "}
+                      · {nights} noche(s)
+                    </div>
+
+                    <a
+                      href={`/vehiculo/${encodeURIComponent(selected.id)}?start=${encodeURIComponent(
+                        start || ""
+                      )}&end=${encodeURIComponent(end || "")}`}
+                      className="inline-flex items-center gap-2 rounded-2xl bg-emerald-400 px-4 py-2 text-sm text-zinc-950 hover:bg-emerald-300"
+                    >
+                      Ver detalle <ArrowRight className="h-4 w-4" />
+                    </a>
                   </div>
                 </div>
-
-                <button
-                  onClick={() => setSelectedId(null)}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-2 text-white/70 hover:bg-white/10"
-                  aria-label="Cerrar"
-                >
-                  <X className="h-4 w-4" />
-                </button>
               </div>
-
-              <div className="mt-3 flex items-center justify-between">
-                <div className="text-sm text-white/80">
-                  <span className="font-semibold text-white">
-                    ${selected.pricePerDay}/día
-                  </span>{" "}
-                  · {nights} noche(s)
-                </div>
-
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-2 rounded-2xl bg-emerald-400 px-4 py-2 text-sm text-zinc-950 hover:bg-emerald-300"
-                >
-                  Ver detalle <ArrowRight className="h-4 w-4" />
-                </a>
-              </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </div>
     </section>
