@@ -129,9 +129,8 @@ export default function HostPage() {
     age: "",
     email: "",
     phone: "",
-    vehicleMake: "",
-    vehicleModel: "",
-    vehicleYear: "",
+    vehicleCount: "1",
+    vehicles: Array.from({ length: 5 }, () => ({ make: "", model: "", year: "" })),
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -142,9 +141,8 @@ export default function HostPage() {
       age: "",
       email: "",
       phone: "",
-      vehicleMake: "",
-      vehicleModel: "",
-      vehicleYear: "",
+      vehicleCount: "1",
+      vehicles: Array.from({ length: 5 }, () => ({ make: "", model: "", year: "" })),
     });
     setErrors({});
     setCaptchaOk(false);
@@ -174,9 +172,6 @@ export default function HostPage() {
     const age = form.age.trim();
     const email = form.email.trim();
     const phone = form.phone.trim();
-    const vehicleMake = form.vehicleMake.trim();
-    const vehicleModel = form.vehicleModel.trim();
-    const vehicleYear = form.vehicleYear.trim();
 
     if (!name) next.name = "Ingrese su nombre.";
 
@@ -195,14 +190,31 @@ export default function HostPage() {
       if (digits.length < 8) next.phone = "Teléfono inválido (mínimo 8 dígitos).";
     }
 
-    if (!vehicleMake) next.vehicleMake = "Ingrese la marca.";
-    if (!vehicleModel) next.vehicleModel = "Ingrese el modelo.";
+    const vehicleCountRaw = form.vehicleCount?.trim();
+    const vehicleCount = Number(vehicleCountRaw);
 
-    if (!vehicleYear) next.vehicleYear = "Ingrese el año.";
-    else {
-      const y = Number(vehicleYear);
-      const thisYear = new Date().getFullYear();
-      if (!Number.isFinite(y) || y < 1950 || y > thisYear + 1) next.vehicleYear = `Año inválido (1950–${thisYear + 1}).`;
+    if (!vehicleCountRaw) next.vehicleCount = "Indique cuántos carros desea registrar.";
+    else if (!Number.isFinite(vehicleCount) || vehicleCount < 1 || vehicleCount > 5)
+      next.vehicleCount = "Cantidad inválida (1–5).";
+
+    const count = Number.isFinite(vehicleCount) ? Math.min(Math.max(vehicleCount, 1), 5) : 1;
+
+    for (let i = 0; i < count; i++) {
+      const v = form.vehicles?.[i] || { make: "", model: "", year: "" };
+      const make = String(v.make || "").trim();
+      const model = String(v.model || "").trim();
+      const year = String(v.year || "").trim();
+
+      if (!make) next[`vehicles.${i}.make`] = "Ingrese la marca.";
+      if (!model) next[`vehicles.${i}.model`] = "Ingrese el modelo.";
+
+      if (!year) next[`vehicles.${i}.year`] = "Ingrese el año.";
+      else {
+        const y = Number(year);
+        const thisYear = new Date().getFullYear();
+        if (!Number.isFinite(y) || y < 1950 || y > thisYear + 1)
+          next[`vehicles.${i}.year`] = `Año inválido (1950–${thisYear + 1}).`;
+      }
     }
 
     setErrors(next);
@@ -221,14 +233,22 @@ export default function HostPage() {
     setSubmitError(null);
 
     try {
+      const count = Math.min(Math.max(Number(form.vehicleCount || 1), 1), 5);
+      const vehicles = (Array.isArray(form.vehicles) ? form.vehicles : [])
+        .slice(0, count)
+        .map((v) => ({
+          make: String(v?.make || "").trim(),
+          model: String(v?.model || "").trim(),
+          year: String(v?.year || "").trim(),
+        }));
+
       const payload = {
         name: form.name,
         age: form.age,
         email: form.email,
         phone: form.phone,
-        vehicleMake: form.vehicleMake,
-        vehicleModel: form.vehicleModel,
-        vehicleYear: form.vehicleYear,
+        vehicleCount: String(count),
+        vehicles,
         source: "website/anfitrion",
       };
 
@@ -577,47 +597,91 @@ export default function HostPage() {
                       </div>
 
                       <div className="rounded-3xl border border-white/10 bg-black/25 p-4">
-                        <div className="text-sm font-semibold text-white">Vehículo</div>
-                        <div className="mt-4 grid gap-4 md:grid-cols-3">
-                          <div>
-                            <label className="text-sm text-white/80">Marca</label>
-                            <input
-                              value={form.vehicleMake}
-                              onChange={(e) => setForm((p) => ({ ...p, vehicleMake: e.target.value }))}
-                              placeholder="Ej. Toyota"
-                              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                            />
-                            {errors.vehicleMake && (
-                              <div className="mt-2 text-xs text-rose-300">{errors.vehicleMake}</div>
-                            )}
-                          </div>
+                        <div className="text-sm font-semibold text-white">Vehículos</div>
 
-                          <div>
-                            <label className="text-sm text-white/80">Modelo</label>
-                            <input
-                              value={form.vehicleModel}
-                              onChange={(e) => setForm((p) => ({ ...p, vehicleModel: e.target.value }))}
-                              placeholder="Ej. Corolla"
-                              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                            />
-                            {errors.vehicleModel && (
-                              <div className="mt-2 text-xs text-rose-300">{errors.vehicleModel}</div>
-                            )}
-                          </div>
+                        <div className="mt-4">
+                          <label className="text-sm text-white/80">¿Cuántos carros desea registrar?</label>
+                          <select
+                            value={form.vehicleCount}
+                            onChange={(e) => setForm((p) => ({ ...p, vehicleCount: e.target.value }))}
+                            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white outline-none ring-0 focus:border-emerald-400/40"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                          </select>
+                          {errors.vehicleCount && (
+                            <div className="mt-2 text-xs text-rose-300">{errors.vehicleCount}</div>
+                          )}
+                        </div>
 
-                          <div>
-                            <label className="text-sm text-white/80">Año</label>
-                            <input
-                              value={form.vehicleYear}
-                              onChange={(e) => setForm((p) => ({ ...p, vehicleYear: e.target.value }))}
-                              inputMode="numeric"
-                              placeholder="Ej. 2020"
-                              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
-                            />
-                            {errors.vehicleYear && (
-                              <div className="mt-2 text-xs text-rose-300">{errors.vehicleYear}</div>
-                            )}
-                          </div>
+                        <div className="mt-6 grid gap-4">
+                          {Array.from({ length: Math.min(Math.max(Number(form.vehicleCount || 1), 1), 5) }, (_, i) => (
+                            <div key={i} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                              <div className="text-sm font-semibold text-white/90">Carro #{i + 1}</div>
+                              <div className="mt-4 grid gap-4 md:grid-cols-3">
+                                <div>
+                                  <label className="text-sm text-white/80">Marca</label>
+                                  <input
+                                    value={form.vehicles?.[i]?.make ?? ""}
+                                    onChange={(e) =>
+                                      setForm((p) => {
+                                        const nextVehicles = [...p.vehicles];
+                                        nextVehicles[i] = { ...nextVehicles[i], make: e.target.value };
+                                        return { ...p, vehicles: nextVehicles };
+                                      })
+                                    }
+                                    placeholder="Ej. Toyota"
+                                    className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                                  />
+                                  {errors[`vehicles.${i}.make`] && (
+                                    <div className="mt-2 text-xs text-rose-300">{errors[`vehicles.${i}.make`]}</div>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <label className="text-sm text-white/80">Modelo</label>
+                                  <input
+                                    value={form.vehicles?.[i]?.model ?? ""}
+                                    onChange={(e) =>
+                                      setForm((p) => {
+                                        const nextVehicles = [...p.vehicles];
+                                        nextVehicles[i] = { ...nextVehicles[i], model: e.target.value };
+                                        return { ...p, vehicles: nextVehicles };
+                                      })
+                                    }
+                                    placeholder="Ej. Corolla"
+                                    className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                                  />
+                                  {errors[`vehicles.${i}.model`] && (
+                                    <div className="mt-2 text-xs text-rose-300">{errors[`vehicles.${i}.model`]}</div>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <label className="text-sm text-white/80">Año</label>
+                                  <input
+                                    value={form.vehicles?.[i]?.year ?? ""}
+                                    onChange={(e) =>
+                                      setForm((p) => {
+                                        const nextVehicles = [...p.vehicles];
+                                        nextVehicles[i] = { ...nextVehicles[i], year: e.target.value };
+                                        return { ...p, vehicles: nextVehicles };
+                                      })
+                                    }
+                                    inputMode="numeric"
+                                    placeholder="Ej. 2020"
+                                    className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-0 focus:border-emerald-400/40"
+                                  />
+                                  {errors[`vehicles.${i}.year`] && (
+                                    <div className="mt-2 text-xs text-rose-300">{errors[`vehicles.${i}.year`]}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
 

@@ -27,8 +27,21 @@ export function Navbar() {
   const homePath = isEn ? "/en" : "/";
   const hostPath = isEn ? "/en/anfitrion" : "/anfitrion";
   const faqPath = isEn ? "/en/faq" : "/faq";
+  
 
   const isHome = pathname === homePath;
+
+  const navItems = [
+    { href: homePath, label: isEn ? "Home" : "Inicio" },
+    { href: hostPath, label: isEn ? "Host" : "Anfitrión" },
+    { href: faqPath, label: "FAQ" }
+  ];
+
+  const isActive = (href: string) => {
+    // Home must match exactly; other routes can match exact or nested.
+    if (href === homePath) return pathname === homePath;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   const sectionHref = (id: string) => {
     const hash = `#${id}`;
@@ -55,13 +68,27 @@ export function Navbar() {
             />
           </Link>
 
-          {/* FAQ link (dedicated page) */}
-          <Link
-            href={faqPath}
-            className="hidden text-sm text-zinc-700 hover:text-zinc-950 dark:text-white/70 dark:hover:text-white md:block"
-          >
-            FAQ
-          </Link>
+          {/* Navegación principal (sin mapa y sin landing de marketing) */}
+          <nav className="hidden items-center gap-2 md:flex">
+            {navItems.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={
+                    "rounded-full px-3 py-1.5 text-sm transition " +
+                    (active
+                      ? "bg-emerald-400/20 text-emerald-100 ring-1 ring-emerald-400/30"
+                      : "text-zinc-700 hover:text-zinc-950 dark:text-white/70 dark:hover:text-white")
+                  }
+                  aria-current={active ? "page" : undefined}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
 
           {/* Right side: language switch above CTA */}
           <div className="flex flex-col items-end gap-3 relative -top-2">
