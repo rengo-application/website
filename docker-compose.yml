@@ -1,0 +1,65 @@
+services:
+  traefik:
+    image: traefik:v3
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --api.dashboard=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+
+      # Let's Encrypt (HTTP challenge)
+      - --certificatesresolvers.letsencrypt.acme.email=administrador@rengo.hn
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/letsencrypt:/letsencrypt
+
+    networks:
+      - web
+
+  webapp:
+    build:
+      context: .
+    env_file:
+      - .env
+    container_name: webapp
+    restart: unless-stopped
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+
+      # HTTPS router (solo root por ahora)
+      - traefik.http.routers.webapp.rule=Host(`rengo.hn`)
+      # - traefik.http.routers.webapp.rule=Host(`rengo.hn`) || Host(`www.rengo.hn`)  # (activar luego)
+
+      - traefik.http.routers.webapp.entrypoints=websecure
+      - traefik.http.routers.webapp.tls=true
+      - traefik.http.routers.webapp.tls.certresolver=letsencrypt
+
+      # Service -> Next.js escucha en 3000
+      - traefik.http.services.webapp.loadbalancer.server.port=3000
+
+      # HTTP -> HTTPS redirect (por ahora desactivado; activar luego cuando todo esté estable)
+      # - traefik.http.routers.webapp-http.rule=Host(`rengo.hn`)
+      # - traefik.http.routers.webapp-http.entrypoints=web
+      # - traefik.http.routers.webapp-http.middlewares=redirect-to-https
+      # - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+      # Para cuando actives www, también activa estos:
+      # - traefik.http.routers.webapp-http.rule=Host(`rengo.hn`) || Host(`www.rengo.hn`)
+
+networks:
+  web:
+    name: web
