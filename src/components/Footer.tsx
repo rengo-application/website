@@ -28,7 +28,7 @@ export function Footer() {
           <div className="space-y-3">
             <div className="text-lg font-semibold tracking-wide">RENGO</div>
             <p className="max-w-md text-sm text-white/70">
-              Renta carros de dueños locales, más opciones y mejores precios.
+              Renta vehículos de dueños locales, más opciones y mejores precios.
             </p>
             <div className="text-xs text-white/50">
               © {new Date().getFullYear()} Rengo. Todos los derechos reservados.

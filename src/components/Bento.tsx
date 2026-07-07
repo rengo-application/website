@@ -3,17 +3,17 @@ import { HandCoins, Shield, Sparkles, Zap } from "lucide-react";
 const items = [
   {
     title: "Rente P2P (viajeros)",
-    desc: "Elija carros de dueños locales y evite la rentadora tradicional.",
+    desc: "Elija vehículos de dueños locales y evite la rentadora tradicional.",
     icon: Sparkles,
   },
   {
     title: "Mejores precios y variedad",
-    desc: "Más opciones por ciudad, fechas y tipo de carro.",
+    desc: "Más opciones por ciudad, fechas y tipo de vehículo.",
     icon: Zap,
   },
   {
     title: "Gane dinero (dueños)",
-    desc: "Monetice su carro cuando no lo usa con total control.",
+    desc: "Monetice su vehículo cuando no lo usa con total control.",
     icon: HandCoins,
   },
   {

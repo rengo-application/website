@@ -603,7 +603,7 @@ export function MapResultsClient() {
 
           <div className="md:col-span-1">
             <label className="mb-1 block text-xs text-white/60">
-              Tipo de carro
+              Tipo de vehículo
             </label>
             <select
               name="type"

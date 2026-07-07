@@ -24,7 +24,7 @@ import type { LucideIcon } from "lucide-react";
 
 const hostBenefits = [
   {
-    title: "Gane dinero con su carro",
+    title: "Gane dinero con su vehículo",
     desc: "Genere ingresos cuando no lo esté usando, con control sobre disponibilidad y precios.",
     icon: CheckCircle2,
   },
@@ -70,7 +70,7 @@ const steps = [
     icon: Smartphone,
   },
   {
-    title: "Publique su carro",
+    title: "Publique su vehículo",
     desc: "Agregue fotos, documentos, precio por día y disponibilidad.",
     icon: Car,
   },
@@ -81,7 +81,7 @@ const steps = [
   },
   {
     title: "Entregue y gane",
-    desc: "Verifique el estado del carro, entregue y reciba su pago según el flujo de la plataforma.",
+    desc: "Verifique el estado del vehículo, entregue y reciba su pago según el flujo de la plataforma.",
     icon: Clock,
   },
 ];
@@ -193,7 +193,7 @@ export default function HostPage() {
     const vehicleCountRaw = form.vehicleCount?.trim();
     const vehicleCount = Number(vehicleCountRaw);
 
-    if (!vehicleCountRaw) next.vehicleCount = "Indique cuántos carros desea registrar.";
+    if (!vehicleCountRaw) next.vehicleCount = "Indique cuántos vehículos desea registrar.";
     else if (!Number.isFinite(vehicleCount) || vehicleCount < 1 || vehicleCount > 5)
       next.vehicleCount = "Cantidad inválida (1–5).";
 
@@ -297,7 +297,7 @@ export default function HostPage() {
 
             <Reveal delay={0.05}>
               <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
-                Publique su carro y genere ingresos como anfitrión.
+                Publique su vehículo y genere ingresos como anfitrión.
               </h1>
             </Reveal>
 
@@ -600,7 +600,7 @@ export default function HostPage() {
                         <div className="text-sm font-semibold text-white">Vehículos</div>
 
                         <div className="mt-4">
-                          <label className="text-sm text-white/80">¿Cuántos carros desea registrar?</label>
+                          <label className="text-sm text-white/80">¿Cuántos vehículos desea registrar?</label>
                           <select
                             value={form.vehicleCount}
                             onChange={(e) => setForm((p) => ({ ...p, vehicleCount: e.target.value }))}

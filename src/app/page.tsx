@@ -102,13 +102,13 @@ export default function Page() {
 
               <Reveal delay={0.05}>
                 <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
-                  Rente un carro fácilmente, directo de dueños locales.
+                  Rente un vehículo fácilmente, directo de dueños locales.
                 </h1>
               </Reveal>
 
               <Reveal delay={0.1}>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-700 dark:text-white/70">
-                  Busque por ciudad y fechas, elija el tipo de carro y reserve
+                  Busque por ciudad y fechas, elija el tipo de vehículo y reserve
                   en minutos. Más opciones, mejores precios y trato directo.
                 </p>
               </Reveal>
@@ -140,7 +140,7 @@ export default function Page() {
 
                     <div className="md:col-span-1">
                       <label className="mb-1 block text-xs text-zinc-600 dark:text-white/60">
-                        Tipo de carro
+                        Tipo de vehículo
                       </label>
                       <select
                         name="type"
@@ -222,7 +222,7 @@ export default function Page() {
                 <div className="mt-6 grid gap-2 text-sm text-zinc-700 dark:text-white/70">
                   {[
                     "Renta P2P: sin rentadoras tradicionales",
-                    "Más variedad de carros por ciudad",
+                    "Más variedad de vehículos por ciudad",
                     "Reserva rápida y coordinación directa",
                   ].map((t) => (
                     <div key={t} className="flex items-center gap-2">
@@ -239,7 +239,7 @@ export default function Page() {
             <Reveal delay={0.1}>
               <div className="mt-12 rounded-3xl border border-black/10 bg-white/70 text-zinc-900 dark:border-white/10 dark:bg-black/35 dark:text-white p-6 backdrop-blur">
                 <div className="text-center text-xs text-zinc-600 dark:text-white/60">
-                  Tipos de carros comunes en la plataforma
+                  Tipos de vehículos comunes en la plataforma
                 </div>
                 <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-zinc-800 dark:text-white/80">
                   {" "}
@@ -278,7 +278,7 @@ export default function Page() {
                   </h3>
 
                   <p className="mt-4 max-w-md text-base leading-7 text-zinc-700 dark:text-white/70">
-                    Explore carros, gestione reservas y coordine directamente
+                    Explore vehículos, gestione reservas y coordine directamente
                     con dueños locales desde la app móvil.
                   </p>
 
@@ -357,7 +357,7 @@ export default function Page() {
               </h2>
               <p className="mt-3 text-base leading-7 text-zinc-700 dark:text-white/70">
                 Desde un viaje de trabajo hasta una escapada al Caribe: elija el
-                carro ideal según su plan.
+                vehículo ideal según su plan.
               </p>
             </div>
           </Reveal>
@@ -457,7 +457,7 @@ export default function Page() {
                 Busque, reserve y conduzca.
               </h2>
               <p className="mt-3 text-base leading-7 text-zinc-700 dark:text-white/70">
-                Elija ciudad y fechas, seleccione el tipo de carro y coordine
+                Elija ciudad y fechas, seleccione el tipo de vehículo y coordine
                 entrega/recogida con el dueño. Sin filas, sin papeleo
                 innecesario.
               </p>
@@ -471,7 +471,7 @@ export default function Page() {
                   En 3 pasos
                 </div>
                 <ol className="mt-4 grid gap-3 text-sm text-zinc-700 dark:text-white/70">
-                  <li>1) Elija ciudad, fechas y el carro.</li>
+                  <li>1) Elija ciudad, fechas y el vehículo.</li>
                   <li>2) Haga la reserva y reciba confirmación.</li>
                   <li>3) Coordine entrega/recogida y disfrute el viaje.</li>
                 </ol>
@@ -620,7 +620,7 @@ export default function Page() {
                       <div className="absolute inset-0 bg-white/10 dark:bg-black/25" />
                       <div className="absolute bottom-4 left-4 rounded-2xl border border-black/10 bg-white/70 text-zinc-800 dark:border-white/10 dark:bg-black/35 dark:text-white/80 px-3 py-2 text-xs backdrop-blur">
                         {" "}
-                        Publique su carro · Controle su disponibilidad
+                        Publique su vehículo · Controle su disponibilidad
                       </div>
                     </div>
                   </div>
@@ -657,7 +657,7 @@ export default function Page() {
                   </summary>
                   <p className="mt-3 text-sm leading-6 text-zinc-700 dark:text-white/70">
                     RENGO es una plataforma digital que conecta a personas que
-                    necesitan movilidad con anfitriones que ofrecen carros en
+                    necesitan movilidad con anfitriones que ofrecen vehículos en
                     alquiler. Es similar a Airbnb, pero enfocado en vehículos en
                     Honduras.
                   </p>
@@ -673,9 +673,9 @@ export default function Page() {
                     </span>
                   </summary>
                   <p className="mt-3 text-sm leading-6 text-zinc-700 dark:text-white/70">
-                    En la app usted busca carros por ciudad, elige uno según sus
+                    En la app usted busca vehículos por ciudad, elige uno según sus
                     necesidades, reserva y coordina la recogida. Si es anfitrión,
-                    publica su carro, recibe solicitudes, confirma reservas y
+                    publica su vehículo, recibe solicitudes, confirma reservas y
                     recibe pagos de forma segura.
                   </p>
                 </details>
@@ -683,7 +683,7 @@ export default function Page() {
                 <details className="group rounded-2xl border border-black/10 bg-white/60 dark:border-white/10 dark:bg-black/30 p-4">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
                     <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                      ¿Qué necesito para alquilar un carro?
+                      ¿Qué necesito para alquilar un vehículo?
                     </span>
                     <span className="text-zinc-500 dark:text-white/60 transition-transform group-open:rotate-180">
                       <ArrowRight className="h-4 w-4" />

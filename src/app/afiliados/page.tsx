@@ -272,7 +272,7 @@ const payload = {
                   <div className="flex items-start gap-3">
                     <Car className="mt-0.5 h-5 w-5 text-emerald-200" />
                     <div>
-                      <div className="font-semibold text-white">¿Tiene varios carros?</div>
+                      <div className="font-semibold text-white">¿Tiene varios vehículos?</div>
                       <div className="mt-1">
                         Seleccione la cantidad y complete la info por cada vehículo. Se enviará todo en una sola
                         solicitud.
@@ -522,7 +522,7 @@ const payload = {
               {[
                 {
                   title: "Más visibilidad",
-                  desc: "Su carro aparece cuando viajeros busquen opciones en su ciudad.",
+                  desc: "Su vehículo aparece cuando viajeros busquen opciones en su ciudad.",
                 },
                 {
                   title: "Cobros seguros",

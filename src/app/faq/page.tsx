@@ -26,19 +26,19 @@ export default function FAQPage() {
               {[
                 {
                   q: "¿Qué es RENGO?",
-                  a: "RENGO es una plataforma digital que conecta a personas que necesitan movilidad con anfitriones que ofrecen carros en alquiler. Es similar a Airbnb, pero enfocado en vehículos y experiencias de transporte en Honduras.",
+                  a: "RENGO es una plataforma digital que conecta a personas que necesitan movilidad con anfitriones que ofrecen vehículos en alquiler. Es similar a Airbnb, pero enfocado en vehículos y experiencias de transporte en Honduras.",
                 },
                 {
                   q: "¿Cómo funciona?",
-                  a: "Para huéspedes/conductores: descargue la app, cree su perfil, busque carros disponibles, reserve y coordine la recogida. Para anfitriones/propietarios: registre su carro con fotos y tarifas, reciba solicitudes, confirme reservas, entregue el vehículo y reciba pagos de forma segura.",
+                  a: "Para huéspedes/conductores: descargue la app, cree su perfil, busque vehículos disponibles, reserve y coordine la recogida. Para anfitriones/propietarios: registre su vehículo con fotos y tarifas, reciba solicitudes, confirme reservas, entregue el vehículo y reciba pagos de forma segura.",
                 },
                 {
                   q: "¿Dónde está disponible RENGO?",
                   a: "Actualmente en Honduras, con operaciones iniciales en San Pedro Sula, La Ceiba y Tegucigalpa. Estamos expandiéndonos a más ciudades y regiones de Centroamérica.",
                 },
                 {
-                  q: "¿Qué tipos de carros puedo alquilar?",
-                  a: "Desde compactos económicos hasta SUVs y camionetas. También carros para viajes familiares, turismo de playa o trabajo logístico.",
+                  q: "¿Qué tipos de vehículos puedo alquilar?",
+                  a: "Desde compactos económicos hasta SUVs y camionetas. También vehículos para viajes familiares, turismo de playa o trabajo logístico.",
                 },
                 {
                   q: "¿Cómo se realizan los pagos?",
@@ -49,7 +49,7 @@ export default function FAQPage() {
                   a: "RENGO ofrece opciones de seguros y coberturas básicas incluidas en cada reserva. El anfitrión y el huésped están protegidos según el plan seleccionado.",
                 },
                 {
-                  q: "¿Qué necesito para alquilar un carro?",
+                  q: "¿Qué necesito para alquilar un vehículo?",
                   a: "Ser mayor de edad, tener licencia de conducir válida y contar con un método de pago registrado en la app.",
                 },
                 {
@@ -58,7 +58,7 @@ export default function FAQPage() {
                 },
                 {
                   q: "¿Qué beneficios tiene ser anfitrión?",
-                  a: "Generar ingresos adicionales con su carro, flexibilidad para decidir cuándo y cómo alquilar, y acceso a herramientas de gestión y pagos automáticos.",
+                  a: "Generar ingresos adicionales con su vehículo, flexibilidad para decidir cuándo y cómo alquilar, y acceso a herramientas de gestión y pagos automáticos.",
                 },
                 {
                   q: "¿Cómo contacto al soporte de RENGO?",

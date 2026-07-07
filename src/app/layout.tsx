@@ -19,13 +19,13 @@ export const metadata: Metadata = {
     template: "RENGO",
   },
   description:
-    "Descubre la nueva forma de alquilar un carro en Honduras. Renta directamente de dueños locales: más opciones, mejor precio y trato directo.",
+    "Descubre la nueva forma de alquilar un vehículo en Honduras. Renta directamente de dueños locales: más opciones, mejor precio y trato directo.",
   metadataBase: new URL("https://www.rengo.hn"),
   alternates: { canonical: "/" },
   openGraph: {
     title: "RENGO | Alquiler de vehículos en Honduras",
     description:
-      "Descubre la nueva forma de alquilar un carro en Honduras. Renta directamente directo de dueños locales: más opciones, mejor precio y trato directo.",
+      "Descubre la nueva forma de alquilar un vehículo en Honduras. Renta directamente directo de dueños locales: más opciones, mejor precio y trato directo.",
     url: "https://www.rengo.hn",
     siteName: "RENGO",
     type: "website",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RENGO | Alquiler de vehículos en Honduras",
     description:
-      "Descubre la nueva forma de alquilar un carro en Honduras. Renta directamente de dueños locales: más opciones, mejor precio y trato directo.",
+      "Descubre la nueva forma de alquilar un vehículo en Honduras. Renta directamente de dueños locales: más opciones, mejor precio y trato directo.",
   },
 };
 
