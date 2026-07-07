@@ -18,7 +18,9 @@ export default function TerminosPage() {
               Términos y Condiciones
             </h1>
             <p className="mt-3 text-sm text-white/70">
-              Última actualización: <span className="text-white/80">[editable]</span>
+              Última actualización: <span className="text-white/80">
+                9 de octubre de 2025
+            </span>
             </p>
           </header>
 

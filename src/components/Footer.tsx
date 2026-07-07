@@ -5,7 +5,8 @@ const NAV_LINKS = [
   { label: "Inicio", href: "/" },
   { label: "Anfitrión", href: "/anfitrion" },
   { label: "FAQ", href: "/faq" },
-  { label: "Términos y condiciones", href: "/terminos" },
+  { label: "Política de Privacidad", href: "/politicas" },
+  { label: "Términos y condiciones", href: "/terminos" }
 ];
 
 // ✅ EDITAR AQUÍ: links EXACTOS a redes sociales

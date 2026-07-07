@@ -96,7 +96,7 @@ export default function Page() {
                 <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 text-zinc-700 dark:border-white/10 dark:bg-black/35 dark:text-white/70 px-3 py-1 text-xs backdrop-blur">
                   {" "}
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  RENGO · Alquiler de vehiculos en Honduras
+                  RENGO · Alquiler de vehículos en Honduras
                 </div>
               </Reveal>
 
@@ -331,7 +331,7 @@ export default function Page() {
                 Descubre la nueva forma de alquilar un coche.
               </h2>
               <p className="mt-3 text-base leading-7 text-zinc-700 dark:text-white/70">
-                Renta de vehiculos en Honduras: más opciones, mejor precio y trato
+                Renta de vehículos en Honduras: más opciones, mejor precio y trato
                 directo con dueños locales. Busque por ciudad y fechas, compare
                 y reserve en minutos.
               </p>
